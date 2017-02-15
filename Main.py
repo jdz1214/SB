@@ -1,49 +1,51 @@
-from Item import Item
+import Functions
 import Utilities
 
 
 def main():
-	execute()
+	items = execute()
+	path = r'/Users/jdz/Google Drive/Business/Strong Boalt/'
+	fsi_items = Utilities.load_fsi(Utilities.load_spreadsheet(path + r'InventoryInquiryReport.csv'))
+	reorders = Functions.show_reorder(items, fsi_items)
 
 
 def execute():
-	items = load(r'/Users/jdz/Google Drive/Business/Strong Boalt/InventoryInquiryReport.csv')
-	items.sort(key=lambda i: i.get_qty() == '0')
+	path = r'/Users/jdz/Google Drive/Business/Strong Boalt/'
+	fsi_spreadsheet = path + r'InventoryInquiryReport.csv'
+	office_tops = path + r'Office Tops.csv'
+	office_boys = path + r'Office Boys.csv'
+	office_bottoms = path + r'Office Bottoms.csv'
+	office_boardshorts = path + r'Office Boardshorts.csv'
+	office_swimtrunks = path + r'Office Swimtrunks.csv'
+	items = load(fsi_spreadsheet, office_tops, office_boys, office_bottoms, office_boardshorts, office_swimtrunks)
 	for item in items:
-		print(item)
-
-
-def load(fsi_spreadsheet):  # office_spreadsheet
-	items = []
-	fsi_lines = Utilities.load_spreadsheet(fsi_spreadsheet)
-	# office_lines = Utilities.load_spreadsheet(office_spreadsheet)
-	# fsi_lines[0]: Short Item Number
-	# fsi_lines[1]: Long Item Number
-	# fsi_lines[2]: Description
-	# fsi_lines[3]: Size
-	# fsi_lines[4]: Color
-	# fsi_lines[5]: UPC
-	# fsi_lines[6]: Category
-	# fsi_lines[7]: Status
-	# fsi_lines[8]: Qty O/H
-	# fsi_lines[9]: Qty Committed
-	# fsi_lines[10]: Qty Available
-	# fsi_lines[11]: Qty B/O
-	# fsi_lines[12]: Reorder Point
-	# fsi_lines[13]: 30-Day Usage
-	# fsi_lines[14]: 60-Day Usage
-	# fsi_lines[15]: 90-Day Usage
-	# fsi_lines[16]: YTD Usage
-	# Item(fsishort, fsilong, name, description, size, color, upc, category, status, sbstyle, pattern, qty_available, price)
-	# office_lines[0]:
-
-	for line in fsi_lines:
-		items.append(Item(line[0], line[1], line[2], line[5], line[6], line[7],
-		                  'sbstyle', line[10], 0.00))
-
+		if item.get_qty() == '':
+			item.set_qty_available('0')
 	return items
 
 
+def load(fsi_spreadsheet, office_tops, office_boys, office_bottoms, office_boardshorts, office_swimtrunks):  # office_spreadsheet
+	items = []
+	fsi_lines = Utilities.load_spreadsheet(fsi_spreadsheet)
+	office_tops_lines = Utilities.load_spreadsheet(office_tops)
+	office_boys_lines = Utilities.load_spreadsheet(office_boys)
+	office_bottoms_lines = Utilities.load_spreadsheet(office_bottoms)
+	office_boardshorts_lines = Utilities.load_spreadsheet(office_boardshorts)
+	office_swimtrunks_lines = Utilities.load_spreadsheet(office_swimtrunks)
+
+	fsi_items = Utilities.load_fsi(fsi_lines)
+	office_tops = Utilities.load_tops(office_tops_lines)
+	office_boys = Utilities.load_boys(office_boys_lines)
+	office_bottoms = Utilities.load_bottoms(office_bottoms_lines)
+	office_boardshorts = Utilities.load_boardshorts(office_boardshorts_lines)
+	office_swimtrunks = Utilities.load_swimtrunks(office_swimtrunks_lines)
+	for ol in [office_tops, office_boys, office_bottoms, office_boardshorts, office_swimtrunks]:
+		l = Utilities.reconcile_fsi_with_office(fsi_items, ol)
+		for i in l:
+			items.append(i)
+	# for i in fsi_items:
+	# 	items.append(i)
+	return items
 
 
 main()
