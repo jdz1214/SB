@@ -9,7 +9,7 @@ def show_reorder(items: list, fsi_items: list):
 				reorders.append(fsi)
 	#  reorders = [item for item in items if item.get_upc() and int(item.get_qty()) < 15 and item.get_size() != 'XS']
 	reorders.sort(key=lambda item: int(item.get_qty()))
-	with open(r'/Users/jdz/PycharmProjects/StrongBoalt/resources/reorders.csv', 'w', newline='') as csvfile:
+	with open(r'/Users/jdz/PycharmProjects/StrongBoalt/resources/reorders.csv', 'w', newline='\n') as csvfile:
 		reorderwriter = csv.writer(csvfile, dialect='excel', delimiter=',')
 		reorderwriter.writerow(['Reorder Qty', 'Name', 'Size', 'Color', 'Pattern', 'UPC'])
 		for item in reorders:
